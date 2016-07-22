@@ -7,10 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.provider.Settings;
 import android.util.Log;
-import java.util.HashMap;
-import java.util.Map;
-import javax.annotation.Nullable;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
@@ -22,6 +20,11 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 public class OrientationModule extends ReactContextBaseJavaModule {
     final private Activity mActivity;
@@ -91,21 +94,35 @@ public class OrientationModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void getOrientationConfig(Callback callback) {
+
+        boolean orientationConfig = false;
+        if (getCurrentActivity() != null) {
+            if (android.provider.Settings.System.getInt(getCurrentActivity().getContentResolver(),
+                    Settings.System.ACCELEROMETER_ROTATION, 0) == 1) {
+                orientationConfig = true;
+            }
+        }
+
+        callback.invoke(orientationConfig);
+    }
+
+    @ReactMethod
     public void getOrientation(Callback callback) {
         final int orientationInt = getReactApplicationContext().getResources().getConfiguration().orientation;
 
         String orientation = this.getOrientationString(orientationInt);
 
         if (orientation == "null") {
-          callback.invoke(orientationInt, null);
+            callback.invoke(orientationInt, null);
         } else {
-          callback.invoke(null, orientation);
+            callback.invoke(null, orientation);
         }
     }
 
     @ReactMethod
     public void lockToPortrait() {
-      mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+      mActivity.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     @ReactMethod

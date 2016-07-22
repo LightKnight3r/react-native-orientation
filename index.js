@@ -11,6 +11,11 @@ module.exports = {
       cb(error, orientation);
     });
   },
+  getOrientationConfig(cb){
+    Orientation.getOrientationConfig((orientationConfig) =>{
+      cb(orientationConfig);
+    });
+  },
   getSpecificOrientation(cb) {
     Orientation.getSpecificOrientation((error,orientation) =>{
       cb(error, orientation);
