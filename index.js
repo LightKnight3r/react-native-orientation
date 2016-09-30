@@ -6,14 +6,12 @@ var orientationDidChangeEvent = "orientationDidChange";
 var specificOrientationDidChangeEvent = "specificOrientationDidChange";
 
 module.exports = {
+  init(){
+    Orientation.init();
+  },
   getOrientation(cb) {
     Orientation.getOrientation((error,orientation) =>{
       cb(error, orientation);
-    });
-  },
-  getOrientationConfig(cb){
-    Orientation.getOrientationConfig((orientationConfig) =>{
-      cb(orientationConfig);
     });
   },
   getSpecificOrientation(cb) {

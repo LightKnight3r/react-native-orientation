@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.provider.Settings;
 import android.util.Log;
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.Nullable;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
@@ -21,20 +23,20 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
 public class OrientationModule extends ReactContextBaseJavaModule {
-    final private Activity mActivity;
+    ReactApplicationContext _reactContext ;
 
-    public OrientationModule(ReactApplicationContext reactContext, final Activity activity) {
+    public OrientationModule(ReactApplicationContext reactContext) {
         super(reactContext);
+        _reactContext = reactContext;
+    }
 
-        mActivity = activity;
+    public void init() {
+        if (getCurrentActivity()==null) {
+            return;
+        }
 
-        final ReactApplicationContext ctx = reactContext;
+        final ReactApplicationContext ctx = _reactContext;
 
         final BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
@@ -48,25 +50,25 @@ public class OrientationModule extends ReactContextBaseJavaModule {
                 params.putString("orientation", orientationValue);
                 if (ctx.hasActiveCatalystInstance()) {
                     ctx
-                        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                        .emit("orientationDidChange", params);
+                            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                            .emit("orientationDidChange", params);
                 }
             }
         };
 
-        activity.registerReceiver(receiver, new IntentFilter("onConfigurationChanged"));
+        getCurrentActivity().registerReceiver(receiver, new IntentFilter("onConfigurationChanged"));
 
         LifecycleEventListener listener = new LifecycleEventListener() {
             @Override
             public void onHostResume() {
-                activity.registerReceiver(receiver, new IntentFilter("onConfigurationChanged"));
+                getCurrentActivity().registerReceiver(receiver, new IntentFilter("onConfigurationChanged"));
             }
 
             @Override
             public void onHostPause() {
                 try
                 {
-                    activity.unregisterReceiver(receiver);
+                    getCurrentActivity().unregisterReceiver(receiver);
                 }
                 catch (java.lang.IllegalArgumentException e) {
                     FLog.e(ReactConstants.TAG, "receiver already unregistered", e);
@@ -77,7 +79,7 @@ public class OrientationModule extends ReactContextBaseJavaModule {
             public void onHostDestroy() {
                 try
                 {
-                    activity.unregisterReceiver(receiver);
+                    getCurrentActivity().unregisterReceiver(receiver);
                 }
                 catch (java.lang.IllegalArgumentException e) {
                     FLog.e(ReactConstants.TAG, "receiver already unregistered", e);
@@ -85,26 +87,13 @@ public class OrientationModule extends ReactContextBaseJavaModule {
             }
         };
 
-        reactContext.addLifecycleEventListener(listener);
+        _reactContext.addLifecycleEventListener(listener);
     }
+
 
     @Override
     public String getName() {
         return "Orientation";
-    }
-
-    @ReactMethod
-    public void getOrientationConfig(Callback callback) {
-
-        boolean orientationConfig = false;
-        if (getCurrentActivity() != null) {
-            if (android.provider.Settings.System.getInt(getCurrentActivity().getContentResolver(),
-                    Settings.System.ACCELEROMETER_ROTATION, 0) == 1) {
-                orientationConfig = true;
-            }
-        }
-
-        callback.invoke(orientationConfig);
     }
 
     @ReactMethod
@@ -114,35 +103,48 @@ public class OrientationModule extends ReactContextBaseJavaModule {
         String orientation = this.getOrientationString(orientationInt);
 
         if (orientation == "null") {
-            callback.invoke(orientationInt, null);
+          callback.invoke(orientationInt, null);
         } else {
-            callback.invoke(null, orientation);
+          callback.invoke(null, orientation);
         }
     }
 
     @ReactMethod
     public void lockToPortrait() {
-      mActivity.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        if (getCurrentActivity()!=null) {
+            getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
     }
 
     @ReactMethod
     public void lockToLandscape() {
-      mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        if (getCurrentActivity()!=null) {
+            getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        }
     }
 
     @ReactMethod
     public void lockToLandscapeLeft() {
-      mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        if (getCurrentActivity()!=null) {
+            getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+
     }
 
     @ReactMethod
     public void lockToLandscapeRight() {
-      mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        if (getCurrentActivity()!=null) {
+            getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        }
+
     }
 
     @ReactMethod
     public void unlockAllOrientations() {
-      mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        if (getCurrentActivity()!=null) {
+            getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        }
     }
 
     @Override
