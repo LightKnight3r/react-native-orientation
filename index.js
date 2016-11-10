@@ -19,6 +19,12 @@ module.exports = {
       cb(error, orientation);
     });
   },
+  disableOrientationSensor() {
+    Orientation.disableOrientationSensor();
+  },
+  enableOrientationSensor() {
+    Orientation.enableOrientationSensor();
+  },
   lockToPortrait() {
     Orientation.lockToPortrait();
   },
