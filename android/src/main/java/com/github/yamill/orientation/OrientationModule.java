@@ -111,11 +111,11 @@ public class OrientationModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void disableOrientationSensor() {
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
     }
     @ReactMethod
     public void enableOrientationSensor() {
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     }
 
     @ReactMethod
